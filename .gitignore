@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# shrimp-task-manager local data
+/shrimp_data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
