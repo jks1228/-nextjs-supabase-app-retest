@@ -43,6 +43,7 @@ Supabase 타입은 Supabase MCP 서버의 `generate_typescript_types` 툴(또는
 ## 환경 변수
 
 `.env.local`에 다음이 필요합니다:
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 

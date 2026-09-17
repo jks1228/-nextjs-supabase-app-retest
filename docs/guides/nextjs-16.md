@@ -16,13 +16,13 @@ Route Groups, Parallel/Intercepting Routes, `after()`, 캐시 태그 등) 참고
 ```tsx
 // ✅ 16 필수 형태 (이 프로젝트는 이미 이렇게 되어 있음)
 interface InvoiceDetailPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 export default async function InvoiceDetailPage({
   params,
 }: InvoiceDetailPageProps) {
-  const { id } = await params
+  const { id } = await params;
   // ...
 }
 ```
@@ -45,7 +45,7 @@ export default async function InvoiceDetailPage({
 ```ts
 const nextConfig: NextConfig = {
   turbopack: { root: process.cwd() }, // 상위 lockfile 오추론 방지
-}
+};
 ```
 
 `npm run dev` / `npm run build` 는 `--turbopack` 플래그로 Turbopack 을 쓴다 (16 에서 안정).
@@ -57,9 +57,9 @@ const nextConfig: NextConfig = {
 
 ```js
 // eslint.config.mjs — 이 프로젝트의 구성
-import next from 'eslint-config-next/core-web-vitals'
-import nextTypeScript from 'eslint-config-next/typescript'
-import prettier from 'eslint-config-prettier/flat'
+import next from "eslint-config-next/core-web-vitals";
+import nextTypeScript from "eslint-config-next/typescript";
+import prettier from "eslint-config-prettier/flat";
 
 const eslintConfig = [
   ...next,
@@ -67,15 +67,15 @@ const eslintConfig = [
   prettier,
   {
     ignores: [
-      'node_modules/**',
-      '.next/**',
-      'out/**',
-      'build/**',
-      'next-env.d.ts',
+      "node_modules/**",
+      ".next/**",
+      "out/**",
+      "build/**",
+      "next-env.d.ts",
     ],
   },
-]
-export default eslintConfig
+];
+export default eslintConfig;
 ```
 
 - `@eslint/eslintrc` 의 `FlatCompat` 은 더 이상 쓰지 않는다 (ESLint 10 에서 깨지고, 9 에서도 비권장).
@@ -108,7 +108,7 @@ opt-in 이며 **이 프로젝트는 켜지 않는다.**
 ```ts
 const nextConfig: NextConfig = {
   agentRules: false,
-}
+};
 ```
 
 ### 8. `tsconfig.json` 자동 재구성

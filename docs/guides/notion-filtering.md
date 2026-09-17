@@ -197,15 +197,17 @@ Notion API는 필드 타입에 따라 다른 필터 연산자를 사용합니다
 ### 패턴 1: 단일 필터
 
 ```typescript
-import { FilterBuilder } from '@/lib/notion/filters'
-import { getNotionClient } from '@/lib/notion/client'
+import { FilterBuilder } from "@/lib/notion/filters";
+import { getNotionClient } from "@/lib/notion/client";
 
-const notion = getNotionClient()
+const notion = getNotionClient();
 
 // 상태가 'Done'인 항목
-const filter = new FilterBuilder().addSelect('Status', 'equals', 'Done').build()
+const filter = new FilterBuilder()
+  .addSelect("Status", "equals", "Done")
+  .build();
 
-const results = await notion.queryDatabase('DATABASE_ID', { filter })
+const results = await notion.queryDatabase("DATABASE_ID", { filter });
 ```
 
 ### 패턴 2: 범위 필터
@@ -215,39 +217,39 @@ const results = await notion.queryDatabase('DATABASE_ID', { filter })
 const filter = {
   and: [
     {
-      property: 'Price',
+      property: "Price",
       number: {
         greater_than_or_equal_to: 100,
       },
     },
     {
-      property: 'Price',
+      property: "Price",
       number: {
         less_than_or_equal_to: 500,
       },
     },
   ],
-}
+};
 
-const results = await notion.queryDatabase('DATABASE_ID', { filter })
+const results = await notion.queryDatabase("DATABASE_ID", { filter });
 ```
 
 또는 헬퍼 함수 사용:
 
 ```typescript
-import { createNumberRangeFilter } from '@/lib/notion/filters'
+import { createNumberRangeFilter } from "@/lib/notion/filters";
 
-const filter = createNumberRangeFilter('Price', 100, 500)
-const results = await notion.queryDatabase('DATABASE_ID', { filter })
+const filter = createNumberRangeFilter("Price", 100, 500);
+const results = await notion.queryDatabase("DATABASE_ID", { filter });
 ```
 
 ### 패턴 3: 비어있음 확인
 
 ```typescript
 // Assignee가 지정되지 않은 작업
-const filter = new FilterBuilder().addText('Assignee', 'is_empty').build()
+const filter = new FilterBuilder().addText("Assignee", "is_empty").build();
 
-const results = await notion.queryDatabase('DATABASE_ID', { filter })
+const results = await notion.queryDatabase("DATABASE_ID", { filter });
 ```
 
 ---
@@ -261,9 +263,9 @@ FilterBuilder는 기본적으로 AND로 조합합니다.
 ```typescript
 // 상태 = "In Progress" AND 우선순위 = "High"
 const filter = new FilterBuilder()
-  .addSelect('Status', 'equals', 'In Progress')
-  .addSelect('Priority', 'equals', 'High')
-  .build()
+  .addSelect("Status", "equals", "In Progress")
+  .addSelect("Priority", "equals", "High")
+  .build();
 
 // 결과:
 // {
@@ -277,10 +279,10 @@ const filter = new FilterBuilder()
 ### OR 조합 (하나 이상의 조건 만족)
 
 ```typescript
-import { createMultiValueFilter } from '@/lib/notion/filters'
+import { createMultiValueFilter } from "@/lib/notion/filters";
 
 // 상태가 "Done" 또는 "Archived"
-const filter = createMultiValueFilter('Status', 'select', ['Done', 'Archived'])
+const filter = createMultiValueFilter("Status", "select", ["Done", "Archived"]);
 
 // 결과:
 // {
@@ -294,32 +296,32 @@ const filter = createMultiValueFilter('Status', 'select', ['Done', 'Archived'])
 ### 복합 AND/OR 조합
 
 ```typescript
-import { ComplexFilterBuilder } from '@/lib/notion/filters'
+import { ComplexFilterBuilder } from "@/lib/notion/filters";
 
 // (상태 = "Done" AND 우선순위 = "High")
 // OR (상태 = "In Review" AND 우선순위 = "Urgent")
 
-const filter = new ComplexFilterBuilder('or') // 최상위는 OR
-  .addConditionGroup('and', builder => {
-    builder.addSelect('Status', 'equals', 'Done')
-    builder.addSelect('Priority', 'equals', 'High')
+const filter = new ComplexFilterBuilder("or") // 최상위는 OR
+  .addConditionGroup("and", (builder) => {
+    builder.addSelect("Status", "equals", "Done");
+    builder.addSelect("Priority", "equals", "High");
   })
-  .addConditionGroup('and', builder => {
-    builder.addSelect('Status', 'equals', 'In Review')
-    builder.addSelect('Priority', 'equals', 'Urgent')
+  .addConditionGroup("and", (builder) => {
+    builder.addSelect("Status", "equals", "In Review");
+    builder.addSelect("Priority", "equals", "Urgent");
   })
-  .build()
+  .build();
 ```
 
 ### NOT 조합 (does_not_equal 사용)
 
 ```typescript
-import { createNotFilter } from '@/lib/notion/filters'
+import { createNotFilter } from "@/lib/notion/filters";
 
 // 상태가 "Cancelled"이 아닌 항목
-const filter = createNotFilter('Status', 'select', 'Cancelled')
+const filter = createNotFilter("Status", "select", "Cancelled");
 
-const results = await notion.queryDatabase('DATABASE_ID', { filter })
+const results = await notion.queryDatabase("DATABASE_ID", { filter });
 ```
 
 **주의:** Notion API는 직접 NOT 연산자를 지원하지 않습니다. 대신 `does_not_equal`, `does_not_contain` 등을 사용합니다.
@@ -331,26 +333,30 @@ const results = await notion.queryDatabase('DATABASE_ID', { filter })
 ### 1. 날짜 범위 필터
 
 ```typescript
-import { createDateRangeFilter } from '@/lib/notion/filters'
+import { createDateRangeFilter } from "@/lib/notion/filters";
 
 // 2024-09-01 ~ 2024-09-30 사이의 항목
-const filter = createDateRangeFilter('Created Date', '2024-09-01', '2024-09-30')
+const filter = createDateRangeFilter(
+  "Created Date",
+  "2024-09-01",
+  "2024-09-30",
+);
 
-const results = await notion.queryDatabase('DATABASE_ID', {
+const results = await notion.queryDatabase("DATABASE_ID", {
   filter,
-  sorts: [{ property: 'Created Date', direction: 'ascending' }],
-})
+  sorts: [{ property: "Created Date", direction: "ascending" }],
+});
 ```
 
 ### 2. 텍스트 검색 (여러 필드)
 
 ```typescript
-import { createTextSearchFilter } from '@/lib/notion/filters'
+import { createTextSearchFilter } from "@/lib/notion/filters";
 
 // Title 또는 Description에 "invoice" 포함
-const filter = createTextSearchFilter(['Title', 'Description'], 'invoice')
+const filter = createTextSearchFilter(["Title", "Description"], "invoice");
 
-const results = await notion.queryDatabase('DATABASE_ID', { filter })
+const results = await notion.queryDatabase("DATABASE_ID", { filter });
 ```
 
 ### 3. 조건부 필터 (동적 필터)
@@ -358,55 +364,55 @@ const results = await notion.queryDatabase('DATABASE_ID', { filter })
 ```typescript
 // 사용자 입력에 따라 동적으로 필터 구성
 function buildSearchFilter(params: {
-  status?: string
-  minPrice?: number
-  maxPrice?: number
-  dateFrom?: string
-  dateTo?: string
+  status?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  dateFrom?: string;
+  dateTo?: string;
 }): Filter | undefined {
-  const builder = new FilterBuilder()
+  const builder = new FilterBuilder();
 
   if (params.status) {
-    builder.addSelect('Status', 'equals', params.status)
+    builder.addSelect("Status", "equals", params.status);
   }
 
   if (params.minPrice !== undefined) {
-    builder.addNumber('Price', 'greater_than_or_equal_to', params.minPrice)
+    builder.addNumber("Price", "greater_than_or_equal_to", params.minPrice);
   }
 
   if (params.maxPrice !== undefined) {
-    builder.addNumber('Price', 'less_than_or_equal_to', params.maxPrice)
+    builder.addNumber("Price", "less_than_or_equal_to", params.maxPrice);
   }
 
   if (params.dateFrom && params.dateTo) {
-    builder.addDate('Created Date', 'on_or_after', params.dateFrom)
-    builder.addDate('Created Date', 'on_or_before', params.dateTo)
+    builder.addDate("Created Date", "on_or_after", params.dateFrom);
+    builder.addDate("Created Date", "on_or_before", params.dateTo);
   }
 
-  return builder.build()
+  return builder.build();
 }
 
 // 사용
 const filter = buildSearchFilter({
-  status: 'Done',
+  status: "Done",
   minPrice: 100,
   maxPrice: 500,
-})
+});
 ```
 
 ### 4. 정렬 (Sort)
 
 ```typescript
 const sorts = [
-  { property: 'Priority', direction: 'descending' }, // 1차 정렬
-  { property: 'Due Date', direction: 'ascending' }, // 2차 정렬
-  { property: 'Created Date', direction: 'descending' }, // 3차 정렬
-]
+  { property: "Priority", direction: "descending" }, // 1차 정렬
+  { property: "Due Date", direction: "ascending" }, // 2차 정렬
+  { property: "Created Date", direction: "descending" }, // 3차 정렬
+];
 
-const results = await notion.queryDatabase('DATABASE_ID', {
+const results = await notion.queryDatabase("DATABASE_ID", {
   filter,
   sorts,
-})
+});
 ```
 
 **정렬 방향:**
@@ -422,24 +428,24 @@ const results = await notion.queryDatabase('DATABASE_ID', {
 
 ```typescript
 // 수동 페이지네이션
-let cursor = undefined
-let hasMore = true
-const allResults = []
+let cursor = undefined;
+let hasMore = true;
+const allResults = [];
 
 while (hasMore) {
-  const response = await notion.queryDatabase('DATABASE_ID', {
+  const response = await notion.queryDatabase("DATABASE_ID", {
     filter,
     start_cursor: cursor,
     page_size: 100, // 최대값
-  })
+  });
 
-  allResults.push(...response.results)
-  cursor = response.next_cursor
-  hasMore = response.has_more
+  allResults.push(...response.results);
+  cursor = response.next_cursor;
+  hasMore = response.has_more;
 
   // API 레이트 제한을 피하기 위해 지연
   if (hasMore) {
-    await new Promise(r => setTimeout(r, 100))
+    await new Promise((r) => setTimeout(r, 100));
   }
 }
 ```
@@ -448,12 +454,12 @@ while (hasMore) {
 
 ```typescript
 // 모든 데이터 자동으로 가져오기
-const allResults = await notion.getAllPages('DATABASE_ID', filter)
+const allResults = await notion.getAllPages("DATABASE_ID", filter);
 
 // 또는 반복자 사용 (메모리 효율적)
-for await (const page of notion.iteratePages('DATABASE_ID', filter)) {
+for await (const page of notion.iteratePages("DATABASE_ID", filter)) {
   // 각 페이지 처리
-  console.log(page.id)
+  console.log(page.id);
 }
 ```
 
@@ -462,52 +468,52 @@ for await (const page of notion.iteratePages('DATABASE_ID', filter)) {
 ```typescript
 // page_size는 1 ~ 100 사이
 // 기본값: 100 (권장)
-const results = await notion.queryDatabase('DATABASE_ID', {
+const results = await notion.queryDatabase("DATABASE_ID", {
   filter,
   page_size: 100, // 최대값 사용
-})
+});
 ```
 
 ### 3. 필터와 정렬 조합으로 API 호출 최소화
 
 ```typescript
 // ❌ 나쁜 예: 가져온 후 클라이언트에서 필터링
-const allData = await notion.getAllPages('DATABASE_ID')
-const filtered = allData.filter(item => item.price > 100)
+const allData = await notion.getAllPages("DATABASE_ID");
+const filtered = allData.filter((item) => item.price > 100);
 
 // ✅ 좋은 예: 서버에서 필터링
 const filter = new FilterBuilder()
-  .addNumber('Price', 'greater_than_or_equal_to', 100)
-  .build()
+  .addNumber("Price", "greater_than_or_equal_to", 100)
+  .build();
 
-const filtered = await notion.queryDatabase('DATABASE_ID', {
+const filtered = await notion.queryDatabase("DATABASE_ID", {
   filter,
   page_size: 100,
-})
+});
 ```
 
 ### 4. 캐싱 전략
 
 ```typescript
-import { unstable_cache } from 'next/cache'
-import { getNotionClient } from '@/lib/notion/client'
+import { unstable_cache } from "next/cache";
+import { getNotionClient } from "@/lib/notion/client";
 
 // 데이터를 1시간 캐시
 export const getCachedInvoices = unstable_cache(
   async () => {
-    const notion = getNotionClient()
+    const notion = getNotionClient();
     const filter = new FilterBuilder()
-      .addSelect('Status', 'equals', 'Done')
-      .build()
+      .addSelect("Status", "equals", "Done")
+      .build();
 
-    return notion.queryDatabase('DATABASE_ID', { filter })
+    return notion.queryDatabase("DATABASE_ID", { filter });
   },
-  ['invoices-done'],
-  { revalidate: 3600 } // 1시간
-)
+  ["invoices-done"],
+  { revalidate: 3600 }, // 1시간
+);
 
 // 페이지에서 사용
-const data = await getCachedInvoices()
+const data = await getCachedInvoices();
 ```
 
 ### 5. 배치 요청
@@ -515,9 +521,9 @@ const data = await getCachedInvoices()
 ```typescript
 // 여러 데이터베이스에서 동시에 데이터 가져오기
 const [invoices, expenses] = await Promise.all([
-  notion.queryDatabase('INVOICES_DB_ID', { filter: invoiceFilter }),
-  notion.queryDatabase('EXPENSES_DB_ID', { filter: expenseFilter }),
-])
+  notion.queryDatabase("INVOICES_DB_ID", { filter: invoiceFilter }),
+  notion.queryDatabase("EXPENSES_DB_ID", { filter: expenseFilter }),
+]);
 ```
 
 ---
@@ -532,13 +538,13 @@ const [invoices, expenses] = await Promise.all([
 
 ```typescript
 // 클라이언트는 자동으로 재시도를 처리합니다
-const notion = new NotionClient()
+const notion = new NotionClient();
 
 // 필요시 재시도 설정 변경
 notion.setRetryConfig(
   5, // 최대 재시도 횟수
-  500 // 초기 대기 시간 (ms)
-)
+  500, // 초기 대기 시간 (ms)
+);
 ```
 
 ### 2. 필터 깊이 제한
@@ -578,7 +584,7 @@ const filter = {
 현재 권장 버전: `2024-06-15`
 
 ```typescript
-const notion = new NotionClient()
+const notion = new NotionClient();
 // 버전은 자동으로 설정됨
 ```
 
@@ -602,22 +608,22 @@ const notion = new NotionClient()
 ### 1. API 키 검증
 
 ```typescript
-const notion = new NotionClient()
+const notion = new NotionClient();
 
-const isValid = await notion.validateApiKey()
+const isValid = await notion.validateApiKey();
 if (!isValid) {
-  throw new Error('유효하지 않은 Notion API 키')
+  throw new Error("유효하지 않은 Notion API 키");
 }
 ```
 
 ### 2. 필터 유효성 검사
 
 ```typescript
-import { validateFilter } from '@/lib/notion/filters'
+import { validateFilter } from "@/lib/notion/filters";
 
-const filter = buildSomeFilter()
+const filter = buildSomeFilter();
 if (!validateFilter(filter)) {
-  throw new Error('유효하지 않은 필터 형식')
+  throw new Error("유효하지 않은 필터 형식");
 }
 ```
 
@@ -625,20 +631,20 @@ if (!validateFilter(filter)) {
 
 ```typescript
 try {
-  const results = await notion.queryDatabase('DATABASE_ID', { filter })
+  const results = await notion.queryDatabase("DATABASE_ID", { filter });
 } catch (error) {
   if (error instanceof Error) {
-    if (error.message.includes('429')) {
+    if (error.message.includes("429")) {
       // 레이트 제한 - 나중에 재시도
-      console.error('API 레이트 제한. 나중에 다시 시도하세요.')
-    } else if (error.message.includes('401')) {
+      console.error("API 레이트 제한. 나중에 다시 시도하세요.");
+    } else if (error.message.includes("401")) {
       // 인증 실패
-      console.error('인증 실패. API 키를 확인하세요.')
-    } else if (error.message.includes('404')) {
+      console.error("인증 실패. API 키를 확인하세요.");
+    } else if (error.message.includes("404")) {
       // 데이터베이스를 찾을 수 없음
-      console.error('데이터베이스를 찾을 수 없습니다.')
+      console.error("데이터베이스를 찾을 수 없습니다.");
     } else {
-      console.error('API 오류:', error.message)
+      console.error("API 오류:", error.message);
     }
   }
 }
@@ -652,72 +658,72 @@ try {
 
 ```typescript
 async function searchInvoices(params: {
-  status?: string
-  minAmount?: number
-  maxAmount?: number
-  clientName?: string
-  dateFrom?: string
-  dateTo?: string
+  status?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  clientName?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }) {
-  const notion = new NotionClient()
+  const notion = new NotionClient();
 
-  const filter = new ComplexFilterBuilder('and')
+  const filter = new ComplexFilterBuilder("and");
 
   // 상태
   if (params.status) {
     filter.addCondition({
-      property: 'Status',
+      property: "Status",
       select: { equals: params.status },
-    })
+    });
   }
 
   // 금액 범위
   if (params.minAmount !== undefined) {
     filter.addCondition({
-      property: 'Amount',
+      property: "Amount",
       number: { greater_than_or_equal_to: params.minAmount },
-    })
+    });
   }
 
   if (params.maxAmount !== undefined) {
     filter.addCondition({
-      property: 'Amount',
+      property: "Amount",
       number: { less_than_or_equal_to: params.maxAmount },
-    })
+    });
   }
 
   // 클라이언트 이름
   if (params.clientName) {
     filter.addCondition({
-      property: 'Client Name',
+      property: "Client Name",
       rich_text: { contains: params.clientName },
-    })
+    });
   }
 
   // 날짜 범위
   if (params.dateFrom) {
     filter.addCondition({
-      property: 'Created Date',
+      property: "Created Date",
       date: { on_or_after: params.dateFrom },
-    })
+    });
   }
 
   if (params.dateTo) {
     filter.addCondition({
-      property: 'Created Date',
+      property: "Created Date",
       date: { on_or_before: params.dateTo },
-    })
+    });
   }
 
-  const results = await notion.queryDatabase('INVOICES_DB_ID', {
+  const results = await notion.queryDatabase("INVOICES_DB_ID", {
     filter: filter.build(),
     sorts: [
-      { property: 'Amount', direction: 'descending' },
-      { property: 'Created Date', direction: 'descending' },
+      { property: "Amount", direction: "descending" },
+      { property: "Created Date", direction: "descending" },
     ],
-  })
+  });
 
-  return results
+  return results;
 }
 ```
 
@@ -725,33 +731,33 @@ async function searchInvoices(params: {
 
 ```typescript
 async function generateDailyReport() {
-  const notion = new NotionClient()
-  const today = new Date().toISOString().split('T')[0]
+  const notion = new NotionClient();
+  const today = new Date().toISOString().split("T")[0];
 
   // 오늘 생성된 모든 항목
   const filter = new FilterBuilder()
-    .addDate('Created Date', 'equals', today)
-    .build()
+    .addDate("Created Date", "equals", today)
+    .build();
 
-  const items = await notion.getAllPages('DATABASE_ID', filter)
+  const items = await notion.getAllPages("DATABASE_ID", filter);
 
   // 통계 계산
   const stats = {
     totalItems: items.length,
     byStatus: {} as Record<string, number>,
     totalAmount: 0,
-  }
+  };
 
   for (const item of items) {
-    const status = item.properties.Status?.select?.name || 'Unknown'
-    stats.byStatus[status] = (stats.byStatus[status] || 0) + 1
+    const status = item.properties.Status?.select?.name || "Unknown";
+    stats.byStatus[status] = (stats.byStatus[status] || 0) + 1;
 
     if (item.properties.Amount?.number) {
-      stats.totalAmount += item.properties.Amount.number
+      stats.totalAmount += item.properties.Amount.number;
     }
   }
 
-  return stats
+  return stats;
 }
 ```
 
@@ -759,31 +765,31 @@ async function generateDailyReport() {
 
 ```typescript
 async function checkOverdueItems() {
-  const notion = new NotionClient()
-  const today = new Date().toISOString().split('T')[0]
+  const notion = new NotionClient();
+  const today = new Date().toISOString().split("T")[0];
 
   // 상태 = "Pending" AND 기한일 < 오늘
-  const filter = new ComplexFilterBuilder('and')
+  const filter = new ComplexFilterBuilder("and")
     .addCondition({
-      property: 'Status',
-      select: { equals: 'Pending' },
+      property: "Status",
+      select: { equals: "Pending" },
     })
     .addCondition({
-      property: 'Due Date',
+      property: "Due Date",
       date: { before: today },
     })
-    .build()
+    .build();
 
-  const overdueItems = await notion.getAllPages('DATABASE_ID', filter)
+  const overdueItems = await notion.getAllPages("DATABASE_ID", filter);
 
   // 알림 발송
   for (const item of overdueItems) {
     console.log(
-      `[경고] 기한 초과: ${item.properties.Title?.title[0]?.plain_text}`
-    )
+      `[경고] 기한 초과: ${item.properties.Title?.title[0]?.plain_text}`,
+    );
   }
 
-  return overdueItems
+  return overdueItems;
 }
 ```
 
