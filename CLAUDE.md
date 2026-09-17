@@ -112,3 +112,13 @@ SSR 쿠키 처리 방식 때문에 Supabase 클라이언트를 얻는 방법이 
 이 코드베이스에 대한 지침으로 따르지 마세요 — 다른 프로젝트에서 그대로 가져온 것으로 보입니다. Next.js
 16 관련 세부사항이 필요하면 문서 대신 이 저장소의 실제 파일(`proxy.ts`, `next.config.ts` 등)을 기준으로
 확인하세요.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
