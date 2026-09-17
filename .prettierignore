@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+build
+coverage
+package-lock.json
+next-env.d.ts
+
+# 벤더링된 스킬/에이전트/명령어 패키지 — 업스트림 원본 포맷을 그대로 유지
+.agents
+.claude
